@@ -7,12 +7,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
+import javax.ws.rs.core.Response;
 
 
 /**
@@ -22,7 +21,9 @@ import javax.ws.rs.core.MediaType;
 
 @Path("/flightItinearies")
 public class FlightItinearies {
-	
+
+
+
     private static HashMap<Airport, Boolean> visited = new HashMap<Airport, Boolean>();
     private static Airports airports = new Airports();
     private static ArrayList<FlightItinerary> itineraryResult = new ArrayList<>();
@@ -30,18 +31,25 @@ public class FlightItinearies {
     private static String username = "webservice";
     private static String password = "password";
     private static boolean authorized = false;
+    private static Users users = new Users();
 
     public FlightItinearies(){
         System.out.println("Flight Itinearies Service Started");
-        authorized = true;
+        authorized = false;
     }
-    
-    
-    
 
 
-    public String authorize(String username, String password){
-        if(this.username.equals(username) && this.password.equals(password))
+
+
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Path("authorize/{username}&{password}")
+    public String authorize(@PathParam("username") String username, @PathParam("password") String password){
+
+        User user = users.getUser(username, password);
+
+        if(user != null)
         {
             authorized = true;
             return "ABCJL8769xzvf";
@@ -55,9 +63,13 @@ public class FlightItinearies {
     @GET
     @Produces(MediaType.APPLICATION_XML)
     @Consumes(MediaType.TEXT_PLAIN)
-    @Path("/getFlightItinearies/{departureCity}&{destinationCity}")
-    public List<FlightItinerary> getFlightItinearies(@PathParam("departureCity") String departureCity, @PathParam("destinationCity") String destinationCity){
+    @Path("/getFlightItinearies/{departureCity}&{destinationCity}/{token}")
+    public List<FlightItinerary> getFlightItinearies(@PathParam("token") String token, @PathParam("departureCity") String departureCity, @PathParam("destinationCity") String destinationCity){
         ArrayList<FlightItinerary> result = null;
+
+        if(token.equals("ABCJL8769xzvf")){
+            authorized = true;
+        }
         
         if(authorized)
         {
@@ -76,8 +88,12 @@ public class FlightItinearies {
             result = DFS(departureAirport, finalDestination);
             itineraryResult = result;
             setItineraryId();
-            }
-        return result;
+            return result;
+        }else{
+            throw new NotAuthorizedException("Not authorized");
+        }
+
+
     }
 
     private void setItineraryId(){
@@ -89,14 +105,23 @@ public class FlightItinearies {
     }
 
 
-    @GET @Produces("text/plain") @Path("/greet")
+    @GET @Produces(MediaType.TEXT_PLAIN) @Consumes(MediaType.TEXT_PLAIN) @Path("/greet")
     public String sayHello() {
         return "Hello RESTful World!";
     }
 
-    public List<Flight> getFlightPrices(String date)
+    @GET
+    @Produces(MediaType.APPLICATION_XML)
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Path("getFlightPrices/{date}/{token}")
+    public List<Flight> getFlightPrices(@PathParam("date") String date, @PathParam("token") String token)
     {
         List<Flight> resultList = null;
+
+        if(token.equals("ABCJL8769xzvf")){
+            authorized = true;
+        }
+
         if(authorized)
         {
             DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
@@ -120,12 +145,20 @@ public class FlightItinearies {
                     }
                 }
             }
-        }
-        return resultList;
+            return resultList;
+        }else
+            throw new NotAuthorizedException("Not authorized");
     }
 
+    @PUT
+    @Produces(MediaType.APPLICATION_XML)
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Path("bookItinerary/{id}&{creditCardNumber}/{token}")
+    public String bookItinerary(@PathParam("id") int id, @PathParam("creditCardNumber") int creditCardNumber, @PathParam("token") String token){
 
-    public String bookItinerary(int id, int creditCardNumber){
+        if(token.equals("ABCJL8769xzvf")){
+            authorized = true;
+        }
 
         if(authorized)
         {
@@ -142,12 +175,20 @@ public class FlightItinearies {
         }
         else
         {
-            return "User is not authorized";
+            throw new NotAuthorizedException("Not authorized");
         }
     }
 
+    @POST
+    @Produces(MediaType.APPLICATION_XML)
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Path("/issueTickets/{creditCardNumber}/{token}")
+    public String issueTickets(@PathParam("creditCardNumber") int creditCardNumber, @PathParam("token") String token){
 
-    public String issueTickets(int creditCardNumber){
+        if(token.equals("ABCJL8769xzvf")){
+            authorized = true;
+        }
+
         if(authorized)
         {
             int itineraryID = 0;
@@ -162,7 +203,7 @@ public class FlightItinearies {
             return "No booking found for your creditcard number";
         }
         else
-            return "User is not authorized";
+            throw new NotAuthorizedException("Not authorized");
     }
 
     private void initDFSVisit(){
