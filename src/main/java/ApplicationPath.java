@@ -8,5 +8,5 @@ public class ApplicationPath extends Application {
 
 	public java.util.Set<java.lang.Class<?>> getClasses() {
 		return new HashSet<>(Arrays.asList(FlightItinearies.class, Flight.class, Airports.class, Airport.class, Booking.class, FlightItinerary.class, Users.class, User.class));
-	};
+	}
 }
