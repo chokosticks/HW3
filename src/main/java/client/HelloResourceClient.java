@@ -10,7 +10,7 @@ public class HelloResourceClient {
     public static void main(String[] args) {
         Client cln = ClientBuilder.newClient();
         String resp = cln
-                .target("http://localhost:8080/restworld/rest/hello/greet")
+                .target("http://localhost:8080/HW3/rest/flightItinearies/greet")
                 .request("text/plain").get(String.class);
         System.out.println(resp);
     }

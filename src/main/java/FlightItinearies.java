@@ -20,7 +20,7 @@ import javax.ws.rs.core.MediaType;
  */
 
 
-@Path("flightItinearies")
+@Path("/flightItinearies")
 public class FlightItinearies {
 	
     private static HashMap<Airport, Boolean> visited = new HashMap<Airport, Boolean>();
@@ -89,6 +89,10 @@ public class FlightItinearies {
     }
 
 
+    @GET @Produces("text/plain") @Path("/greet")
+    public String sayHello() {
+        return "Hello RESTful World!";
+    }
 
     public List<Flight> getFlightPrices(String date)
     {
