@@ -5,10 +5,16 @@
     <description>JAX-RS Tools Generated - Do not modify</description>
     <servlet-name>ApplicationPath</servlet-name>
     <servlet-class></servlet-class>
+    <!--<init-param>-->
+      <!--<param-name>httpMethods</param-name>-->
+      <!--<param-value>GET,POST,DELETE,PUT,HEAD</param-value>-->
+    <!--</init-param>-->
+
     <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet-mapping>
     <servlet-name>ApplicationPath</servlet-name>
     <url-pattern>/rest/*</url-pattern>
   </servlet-mapping>
+
 </web-app>

@@ -1,4 +1,6 @@
 //import flightitinearies.ns.AuthService;
+import com.google.common.collect.Lists;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -8,10 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.*;
 
 
 /**
@@ -64,7 +63,7 @@ public class FlightItinearies {
     @Produces(MediaType.APPLICATION_XML)
     @Consumes(MediaType.TEXT_PLAIN)
     @Path("/getFlightItinearies/{departureCity}&{destinationCity}/{token}")
-    public List<FlightItinerary> getFlightItinearies(@PathParam("token") String token, @PathParam("departureCity") String departureCity, @PathParam("destinationCity") String destinationCity){
+    public Response/*List<FlightItinerary>*/ getFlightItinearies(@PathParam("token") String token, @PathParam("departureCity") String departureCity, @PathParam("destinationCity") String destinationCity){
         ArrayList<FlightItinerary> result = null;
 
         if(token.equals("ABCJL8769xzvf")){
@@ -77,7 +76,7 @@ public class FlightItinearies {
 
             if(!airports.airportExists(destinationCity) || !airports.airportExists(departureCity)) {
                 System.out.println("Non existing airport specified");
-                return result;
+//                return result;
             }
 
             Airport finalDestination = airports.getAirport(destinationCity);
@@ -88,7 +87,10 @@ public class FlightItinearies {
             result = DFS(departureAirport, finalDestination);
             itineraryResult = result;
             setItineraryId();
-            return result;
+
+            GenericEntity<ArrayList<FlightItinerary>> entity = new GenericEntity<ArrayList<FlightItinerary>>(Lists.newArrayList(result)){};
+
+            return Response.ok(200).entity(entity).build();
         }else{
             throw new NotAuthorizedException("Not authorized");
         }
@@ -114,7 +116,7 @@ public class FlightItinearies {
     @Produces(MediaType.APPLICATION_XML)
     @Consumes(MediaType.TEXT_PLAIN)
     @Path("getFlightPrices/{date}/{token}")
-    public List<Flight> getFlightPrices(@PathParam("date") String date, @PathParam("token") String token)
+    public Response getFlightPrices(@PathParam("date") String date, @PathParam("token") String token)
     {
         List<Flight> resultList = null;
 
@@ -145,7 +147,9 @@ public class FlightItinearies {
                     }
                 }
             }
-            return resultList;
+            GenericEntity<List<Flight>> entity = new GenericEntity<List<Flight>>(Lists.newArrayList(resultList)){};
+
+            return Response.ok(200).entity(entity).build();
         }else
             throw new NotAuthorizedException("Not authorized");
     }
