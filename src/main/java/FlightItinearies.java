@@ -107,6 +107,23 @@ public class FlightItinearies {
         }
     }
 
+    @POST
+    @Produces({MediaType.APPLICATION_XML, MediaType.TEXT_PLAIN})
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Path("/addFlights")
+    public String addFlight(JAXBElement<Flight> flightJAXBElement){
+
+        Flight flight = flightJAXBElement.getValue();
+        for(Airport airport : airports.getAirports())
+        {
+            if(airport.getName().equalsIgnoreCase(flight.getDepartureCity()))
+            {
+                airport.getFlights().add(flight);
+            }
+        }
+        return "Success.";
+    }
+
 
     @GET @Produces(MediaType.TEXT_PLAIN)
     @Consumes(MediaType.TEXT_PLAIN)
