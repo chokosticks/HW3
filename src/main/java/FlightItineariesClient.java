@@ -43,9 +43,9 @@ public class FlightItineariesClient {
                     .target(baseURL + "flightItinearies/getFlightItinearies/Stockholm&Moskva/"+token)
                     .request(MediaType.APPLICATION_XML)
                     .get();
-            ArrayList<FlightItinerary> response = flightItineariesResponse.readEntity(new GenericType<ArrayList<FlightItinerary>>(){});
+            ArrayList<FlightItinerary> itineariesResponse = flightItineariesResponse.readEntity(new GenericType<ArrayList<FlightItinerary>>(){});
             
-            for(FlightItinerary fi: response){
+            for(FlightItinerary fi: itineariesResponse){
                 System.out.println("FlightItineraryID:"+"["+fi.getId()+"]\n");
                 for(Flight fl: fi.getFlights()){
                     System.out.println(fl.toString());
@@ -92,9 +92,29 @@ public class FlightItineariesClient {
                 System.out.println(ex.getMessage());
             }
 
+            //BOOKING ITINERARY
+            try{
+
+                Booking booking = new Booking(1337, itineariesResponse.get(2));
+
+                Response bookingResponse = cln
+                        .target(baseURL + "bookItinerary/2&1337/"+token)
+                        .request(MediaType.TEXT_PLAIN)
+                        .put(Entity.entity(booking, MediaType.APPLICATION_XML));
+
+                if(bookingResponse.getStatusInfo().getReasonPhrase().equals("Bad Request")){
+                    System.out.println("Booking failed");
+                }else{
+                    System.out.println("Booking created");
+                }
+
+            }catch(Exception ex){
+                ex.printStackTrace();
+            }
+
+
+            //ISSUE TICKETS
             try {
-
-
                 String creditCardNumber = "1337";
 
                 String issueTicketsResponse = cln
@@ -107,6 +127,8 @@ public class FlightItineariesClient {
             }catch(Exception ex){
                 ex.printStackTrace();
             }
+
+
 
 
 

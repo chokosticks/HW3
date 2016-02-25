@@ -19,7 +19,7 @@ public class Users {
 		User user = new User("Anton","Dahlin");
         User user1 = new User("Rickard","Zwahlen");
         users.put(user.getUsername(), user);
-        users.put(user.getUsername(), user);
+        users.put(user1.getUsername(), user1);
 	}
 
 	@GET

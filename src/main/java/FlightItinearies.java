@@ -12,6 +12,8 @@ import java.util.List;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
+import javax.xml.bind.JAXB;
+import javax.xml.bind.JAXBElement;
 
 
 /**
@@ -27,7 +29,7 @@ public class FlightItinearies {
     private static HashMap<Airport, Boolean> visited = new HashMap<Airport, Boolean>();
     private static Airports airports = new Airports();
     private static ArrayList<FlightItinerary> itineraryResult = new ArrayList<>();
-    private static ArrayList<Booking> bookedItinearies = new ArrayList<>();
+    private static HashMap<Integer, Booking> bookedItinearies = new HashMap<>();
     private static boolean authorized = false;
     private static Users users = new Users();
 
@@ -156,36 +158,44 @@ public class FlightItinearies {
     }
 
     @PUT
-    @Produces(MediaType.APPLICATION_XML)
+    @Produces({MediaType.APPLICATION_XML, MediaType.TEXT_PLAIN})
     @Consumes(MediaType.TEXT_PLAIN)
     @Path("bookItinerary/{id}&{creditCardNumber}/{token}")
-    public String bookItinerary(@PathParam("id") int id, @PathParam("creditCardNumber") int creditCardNumber, @PathParam("token") String token){
+    public Response bookItinerary(JAXBElement<Booking> booking, @PathParam("id") int id, @PathParam("creditCardNumber") int creditCardNumber, @PathParam("token") String token){
+
+        Booking newBooking = booking.getValue();
 
         if(token.equals("ABCJL8769xzvf")){
             authorized = true;
         }
 
-        if(authorized)
-        {
-            if (id < itineraryResult.size())
-            {
-                bookedItinearies.add(new Booking(creditCardNumber, itineraryResult.get(id)));
-                String from, to = "";
-                Booking booking = bookedItinearies.get(bookedItinearies.size() - 1);
-                from = booking.getItinerary().getFlights().get(0).getDepartureCity();
-                to = booking.getItinerary().getFlights().get(booking.getItinerary().getFlights().size() - 1).getDestinationCity();
-                return "Booking succeeded for flight itinerary id: " + id + " from " + from + " to " + to + " for " + booking.getItinerary().getPrice();
-            } else
-                return "No itinerary with that id exists";
-        }
-        else
-        {
+        if(authorized) {
+
+            if(!bookedItinearies.containsKey(newBooking.getCreditCardNumber())){
+                bookedItinearies.put(newBooking.getCreditCardNumber(), newBooking);
+                return Response.ok(200).build();
+            }else{
+                throw new BadRequestException();
+            }
+
+//            if (id < itineraryResult.size())
+//            {
+//                bookedItinearies.add(new Booking(creditCardNumber, itineraryResult.get(id)));
+//                String from, to = "";
+//                Booking booking = bookedItinearies.get(bookedItinearies.size() - 1);
+//                from = booking.getItinerary().getFlights().get(0).getDepartureCity();
+//                to = booking.getItinerary().getFlights().get(booking.getItinerary().getFlights().size() - 1).getDestinationCity();
+//                return "Booking succeeded for flight itinerary id: " + id + " from " + from + " to " + to + " for " + booking.getItinerary().getPrice();
+//                return Response.ok(200).build();
+//            } else
+//                return "No itinerary with that id exists";
+        }else{
             throw new NotAuthorizedException("Not authorized");
         }
     }
 
     @POST
-    @Produces(MediaType.APPLICATION_XML)
+    @Produces({MediaType.APPLICATION_XML, MediaType.TEXT_PLAIN})
     @Consumes(MediaType.TEXT_PLAIN)
     @Path("/issueTickets/{creditCardNumber}/{token}")
     public String issueTickets(@PathParam("creditCardNumber") int creditCardNumber, @PathParam("token") String token){
@@ -196,16 +206,14 @@ public class FlightItinearies {
 
         if(authorized)
         {
-            int itineraryID = 0;
-            for (Booking booking : bookedItinearies)
-            {
-                if (booking.getCreditCardNumber() == creditCardNumber)
-                {
-                    return "Tickets issued for itinerary id: " + booking.getItinerary().getId();
+            if(bookedItinearies.containsKey(creditCardNumber)){
 
-                }
+                Booking booking = bookedItinearies.get(creditCardNumber);
+                bookedItinearies.remove(creditCardNumber);
+                return "Tickets issued for itinerary: "+booking.getItinerary().getId();
+            }else{
+                return "No booking found with creditcard number: "+creditCardNumber;
             }
-            return "No booking found for your creditcard number";
         }
         else
             throw new NotAuthorizedException("Not authorized");
