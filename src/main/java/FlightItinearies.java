@@ -1,5 +1,6 @@
 //import flightitinearies.ns.AuthService;
-import com.google.common.collect.Lists;
+
+import jersey.repackaged.com.google.common.collect.Lists;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -27,8 +28,6 @@ public class FlightItinearies {
     private static Airports airports = new Airports();
     private static ArrayList<FlightItinerary> itineraryResult = new ArrayList<>();
     private static ArrayList<Booking> bookedItinearies = new ArrayList<>();
-    private static String username = "webservice";
-    private static String password = "password";
     private static boolean authorized = false;
     private static Users users = new Users();
 
@@ -107,7 +106,9 @@ public class FlightItinearies {
     }
 
 
-    @GET @Produces(MediaType.TEXT_PLAIN) @Consumes(MediaType.TEXT_PLAIN) @Path("/greet")
+    @GET @Produces(MediaType.TEXT_PLAIN)
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Path("/greet")
     public String sayHello() {
         return "Hello RESTful World!";
     }
@@ -118,7 +119,7 @@ public class FlightItinearies {
     @Path("getFlightPrices/{date}/{token}")
     public Response getFlightPrices(@PathParam("date") String date, @PathParam("token") String token)
     {
-        List<Flight> resultList = null;
+        ArrayList<Flight> resultList = null;
 
         if(token.equals("ABCJL8769xzvf")){
             authorized = true;
@@ -147,7 +148,7 @@ public class FlightItinearies {
                     }
                 }
             }
-            GenericEntity<List<Flight>> entity = new GenericEntity<List<Flight>>(Lists.newArrayList(resultList)){};
+            GenericEntity<ArrayList<Flight>> entity = new GenericEntity<ArrayList<Flight>>(Lists.newArrayList(resultList)){};
 
             return Response.ok(200).entity(entity).build();
         }else
@@ -210,6 +211,12 @@ public class FlightItinearies {
             throw new NotAuthorizedException("Not authorized");
     }
 
+
+
+
+
+
+    //HELP FUNCTIONS
     private void initDFSVisit(){
         for(Airport airport: airports.getAirports()){
             visited.put(airport,false);
