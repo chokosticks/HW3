@@ -70,7 +70,6 @@ public class FlightItineariesClient {
             String username ="Ulf";
             String password = "Brandeby";
 
-            GenericType<JAXBElement<User>> user = new GenericType<JAXBElement<User>>(){};
 
 
             //NEW USER
@@ -98,17 +97,20 @@ public class FlightItineariesClient {
                 Booking booking = new Booking(1337, itineariesResponse.get(2));
 
                 Response bookingResponse = cln
-                        .target(baseURL + "bookItinerary/2&1337/"+token)
+                        .target(baseURL + "flightItinearies/bookItinerary/"+token)
                         .request(MediaType.TEXT_PLAIN)
                         .put(Entity.entity(booking, MediaType.APPLICATION_XML));
 
+
+
                 if(bookingResponse.getStatusInfo().getReasonPhrase().equals("Bad Request")){
                     System.out.println("Booking failed");
-                }else{
+                }else if(bookingResponse.getStatus() == 200){
+
                     System.out.println("Booking created");
                 }
 
-            }catch(Exception ex){
+            }catch(BadRequestException ex){
                 ex.printStackTrace();
             }
 
@@ -136,14 +138,5 @@ public class FlightItineariesClient {
         }catch(NotAuthorizedException ex){
             System.out.println("Not authorized");
         }
-
-//        try {
-//            String resp = cln
-//                    .target(baseURL + "flightItinearies/bookItinerary/2"+token)
-//                    .request(MediaType.TEXT_PLAIN).get(String.class);
-//            System.out.println(resp);
-//        }catch(NotAuthorizedException ex){
-//            System.out.println("Not authorized");
-//        }
     }
 }

@@ -38,7 +38,7 @@ public class Users {
 	@PUT
 	@Produces(MediaType.TEXT_PLAIN)
 	@Consumes(MediaType.APPLICATION_XML)
-	@Path("create")///{username}&{password}")
+	@Path("create")
 	public Response createUser(JAXBElement<User> user/*@PathParam("username") String username, @PathParam("password") String password*/){
 
         User newUser = user.getValue();
@@ -54,6 +54,7 @@ public class Users {
     @Consumes(MediaType.TEXT_PLAIN)
     @Path("delete/{username}&{password}")
     public String deleteUser(@PathParam("username") String username, @PathParam("password") String password){
+
         if(!users.containsKey(username)){
             return "User doesn't exist!";
         }else if(!users.get(username).getPassword().equals(password)){
@@ -65,16 +66,22 @@ public class Users {
     }
 
     @POST
-    @Consumes(MediaType.TEXT_PLAIN)
-    @Path("update/{username}&{password}/password/{newpassword}")
-    public String deleteUser(@PathParam("username") String username, @PathParam("password") String password, @PathParam("newpassword") String newPassword){
+    @Consumes({ MediaType.APPLICATION_XML,MediaType.TEXT_PLAIN})
+    @Path("update/{password}")
+    public Response updateUser(JAXBElement<User> user, @PathParam("password") String password){
+
+        User updatedUser = user.getValue();
+        String username = updatedUser.getUsername();
+        String newPassword = updatedUser.getPassword();
+
+
         if(!users.containsKey(username)){
             throw new NotAuthorizedException("User doesn't exists!");
         }else if(!users.get(username).getPassword().equals(password)){
             throw new NotAuthorizedException("Wrong password!");
         }else{
             users.get(username).setPassword(newPassword);
-            return "Success! Password updated";
+            return Response.ok(200).build();
         }
     }
 

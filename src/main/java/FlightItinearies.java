@@ -64,7 +64,7 @@ public class FlightItinearies {
     @Produces(MediaType.APPLICATION_XML)
     @Consumes(MediaType.TEXT_PLAIN)
     @Path("/getFlightItinearies/{departureCity}&{destinationCity}/{token}")
-    public Response/*List<FlightItinerary>*/ getFlightItinearies(@PathParam("token") String token, @PathParam("departureCity") String departureCity, @PathParam("destinationCity") String destinationCity){
+    public Response getFlightItinearies(@PathParam("token") String token, @PathParam("departureCity") String departureCity, @PathParam("destinationCity") String destinationCity){
         ArrayList<FlightItinerary> result = null;
 
         if(token.equals("ABCJL8769xzvf")){
@@ -159,9 +159,9 @@ public class FlightItinearies {
 
     @PUT
     @Produces({MediaType.APPLICATION_XML, MediaType.TEXT_PLAIN})
-    @Consumes(MediaType.TEXT_PLAIN)
-    @Path("bookItinerary/{id}&{creditCardNumber}/{token}")
-    public Response bookItinerary(JAXBElement<Booking> booking, @PathParam("id") int id, @PathParam("creditCardNumber") int creditCardNumber, @PathParam("token") String token){
+    @Consumes({MediaType.APPLICATION_XML,MediaType.TEXT_PLAIN})
+    @Path("bookItinerary/{token}")//{id}&{creditCardNumber}/{token}")
+    public Response bookItinerary(JAXBElement<Booking> booking, @PathParam("token") String token){
 
         Booking newBooking = booking.getValue();
 
@@ -177,18 +177,6 @@ public class FlightItinearies {
             }else{
                 throw new BadRequestException();
             }
-
-//            if (id < itineraryResult.size())
-//            {
-//                bookedItinearies.add(new Booking(creditCardNumber, itineraryResult.get(id)));
-//                String from, to = "";
-//                Booking booking = bookedItinearies.get(bookedItinearies.size() - 1);
-//                from = booking.getItinerary().getFlights().get(0).getDepartureCity();
-//                to = booking.getItinerary().getFlights().get(booking.getItinerary().getFlights().size() - 1).getDestinationCity();
-//                return "Booking succeeded for flight itinerary id: " + id + " from " + from + " to " + to + " for " + booking.getItinerary().getPrice();
-//                return Response.ok(200).build();
-//            } else
-//                return "No itinerary with that id exists";
         }else{
             throw new NotAuthorizedException("Not authorized");
         }
