@@ -28,7 +28,7 @@ public class UsersClient
                 .target(baseURL+"users/user/Anton&Dahlin")
                 .request(MediaType.APPLICATION_XML)
                 .get(erasure);
-
+        System.out.println("GET user:");
         System.out.println(responseUser.getValue().getUsername());
         System.out.println(responseUser.getValue().getPassword());
         System.out.println("\n\n");
@@ -55,7 +55,7 @@ public class UsersClient
                 .get(erasure);
 
 
-
+        System.out.println("PUT user:");
         System.out.println(responseNewUser.getValue().getUsername());
         System.out.println(responseNewUser.getValue().getPassword());
         System.out.println("\n\n");
@@ -78,7 +78,7 @@ public class UsersClient
                 .get(erasure);
 
 
-
+        System.out.println("POST user (update):");
         System.out.println(responseUpdatedUser.getValue().getUsername());
         System.out.println(responseUpdatedUser.getValue().getPassword());
         System.out.println("\n\n");
@@ -98,13 +98,13 @@ public class UsersClient
                     .target(baseURL + "users/user/" + updatedUser.getUsername() + "&" + updatedUser.getPassword())
                     .request(MediaType.APPLICATION_XML)
                     .get(erasure);
-
+            System.out.println("DELETE user:");
             System.out.println(responseDeletedUser.getValue().getUsername());
             System.out.println(responseDeletedUser.getValue().getPassword());
             System.out.println("\n\n");
 
         }catch(NotFoundException ex){
-            System.out.println("User not found");
+            System.out.println("User not found (failed GET) non-existent user");
         }
 
 

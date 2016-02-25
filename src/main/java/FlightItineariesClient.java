@@ -38,6 +38,9 @@ public class FlightItineariesClient {
 
             System.out.println("Authorzation Response: "+token);
 
+
+
+
             //FLIGHT ITINEARIES FOR GIVEN DEPARTURE AND DESTINATION
             Response flightItineariesResponse = cln
                     .target(baseURL + "flightItinearies/getFlightItinearies/Stockholm&Moskva/"+token)
